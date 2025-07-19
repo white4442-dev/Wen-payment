@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Payment - Dark Mode</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0d0d0d;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #00f0ff;
+      overflow-y: auto;
+    }
+    
+    .led-text {
+      color: #00f0ff;
+      animation: glitch-blue 60ms infinite alternate;
+      text-shadow: 0 0 5px #00f0ff, 0 0 10px #00f0ff;
+    }
+
+    @keyframes glitch-blue {
+      0% { opacity: 1; }
+      10% { opacity: 0; }
+      20% { opacity: 1; }
+    }
+
+    .panel {
+      background: rgba(128, 128, 128, 0.2);
+      border: 2px solid red;
+      box-shadow: 0 0 10px red;
+      border-radius: 20px;
+      padding: 20px;
+      margin: 50px auto;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      text-align: center;
+      display: none;
+    }
+
+    .circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid red;
+      box-shadow: 0 0 12px red;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+
+    .circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    button {
+      background-color: #222;
+      color: #00f0ff;
+      border: 1px solid red;
+      box-shadow: 0 0 8px red;
+      padding: 12px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #loading {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .led-red {
+      color: red;
+      font-weight: bold;
+      text-shadow: 0 0 6px red, 0 0 12px red;
+    }
+
+    #wind {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    #salin-info {
+      font-size: 14px;
+      color: lime;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <h1 class="led-red">Loading...</h1>
+</div>
+
+<div id="wind"></div>
+
+<video id="player" src="https://files.catbox.moe/2ap54p.mp4" preload="auto" style="display:none;"></video>
+
+<div id="menu-utama" class="panel">
+  <div class="circle"><img src="https://files.catbox.moe/es95cv.jpg" /></div>
+  <h2 class="led-text">Selamat Datang</h2>
+  <p class="led-text">Silakan pilih metode pembayaran:</p>
+  <button onclick="openMenu('dana')">Dana</button>
+  <button onclick="openMenu('qris')">QRIS</button>
+  <p class="led-text">©Web by Jalal mods</p>
+</div>
+
+<div id="menu-dana" class="panel">
+  <div class="circle"><img src="https://files.catbox.moe/es95cv.jpg" /></div>
+ <h2 class="led-text">Pembayaran Dana</h2>
+  <p class="led-text">Nomor Dana:</p>
+  <p id="nomordana" class="led-text">087781076661</p>
+ <button onclick="salinNomor()">Salin Nomor Dana</button>
+  <p id="salin-info">✅ Nomor disalin!</p>
+  <button onclick="backToMenu()">Kembali</button>
+  <p class="led-text">©Web by Jalal mods</p>
+</div>
+
+
+<div id="menu-qris" class="panel">
+  <div class="circle"><img src="https://files.catbox.moe/es95cv.jpg" /></div>
+  <h2 class="led-text">Pembayaran QRIS</h2>
+ <h2 class="led-text">Atas Nama = Jalal-999</h2>
+  <p class="led-text">Scan QRIS di bawah ini:</p>
+  <img id="qris-img" src="https://files.catbox.moe/ma782v.jpg" width="80%" style="border:2px solid red; box-shadow:0 0 10px red; border-radius:10px;">
+  <br>
+<button onclick="forceDownload()">Unduh QRIS</button>
+
+
+  <button onclick="backToMenu()">Kembali</button>
+   <p class="led-text">©Web by Jalal mods</p>
+</div>
+
+<script>
+  const loading = document.getElementById('loading');
+  const audio = document.getElementById('player');
+
+  window.onload = () => {
+    setTimeout(() => {
+      loading.style.display = 'none';
+      document.getElementById('menu-utama').style.display = 'block';
+    }, 2000);
+  };
+  
+function forceDownload() {
+  const url = 'https://files.catbox.moe/ma782v.jpg';
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'jalal.jpg';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    })
+    .catch(err => alert('Gagal mengunduh QRIS'));
+}
+
+function salinNomor() {
+  const nomor = document.getElementById("nomordana").innerText;
+  navigator.clipboard.writeText(nomor).then(() => {
+    alert("Nomor Dana berhasil disalin!");
+  }).catch(err => {
+    alert("Gagal menyalin: " + err);
+  });
+}
+
+  function openMenu(menu) {
+    document.getElementById('menu-utama').style.display = 'none';
+    loading.style.display = 'flex';
+    setTimeout(() => {
+      loading.style.display = 'none';
+      document.getElementById('menu-' + menu).style.display = 'block';
+      audio.play();
+    }, 2000);
+  }
+
+  function backToMenu() {
+    document.getElementById('menu-dana').style.display = 'none';
+    document.getElementById('menu-qris').style.display = 'none';
+    loading.style.display = 'flex';
+    audio.pause();
+    audio.currentTime = 0;
+    setTimeout(() => {
+      loading.style.display = 'none';
+      document.getElementById('menu-utama').style.display = 'block';
+    }, 2000);
+  }
+
+  function salin(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const info = document.getElementById('salin-info');
+      info.style.display = 'block';
+      setTimeout(() => { info.style.display = 'none'; }, 1500);
+    });
+  }
+</script>
+
+<!-- Particle effect -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS("wind", {
+  "particles": {
+    "number": { "value": 50 },
+    "color": { "value": "#ffffff" },
+    "shape": { "type": "circle" },
+    "opacity": { "value": 0.2 },
+    "size": { "value": 3 },
+    "move": {
+      "enable": true,
+      "speed": 1,
+      "direction": "right",
+      "straight": false
+    }
+  }
+});
+</script>
+
+</body>
+</html>
